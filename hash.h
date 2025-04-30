@@ -20,7 +20,36 @@ struct MyStringHash {
     HASH_INDEX_T operator()(const std::string& k) const
     {
         // Add your code here
+        unsigned long long w[5] = {0, 0, 0, 0, 0};
+        int len = k.length();
+        int group = 0;
 
+        // process starting from end of string in chunks of 6
+        for (int i = len; i > 0 && group < 5; i -= 6, ++group) {
+            unsigned long long chunkVal = 0;
+            //unsigned long long power = 1;
+
+            // pocess each character in chunk
+            for (int j = std::max(0, i - 6); j < i; ++j) {
+                char c = std::tolower(k[j]); // make char lowercase
+                int val;
+                if (c >= 'a' && c <= 'z') val = c - 'a';
+                else if (c >= '0' && c <= '9') val = 26 + (c - '0');
+                else val = 0;
+
+                chunkVal = chunkVal * 36 + val;
+            }
+
+            w[4 - group] = chunkVal;
+        }
+
+        // Compute final hash with dot product of rValues and w
+        unsigned long long hash = 0;
+        for (int i = 0; i < 5; ++i) {
+            hash += rValues[i] * w[i];
+        }
+
+        return static_cast<HASH_INDEX_T>(hash);
 
     }
 
@@ -28,6 +57,16 @@ struct MyStringHash {
     HASH_INDEX_T letterDigitToNumber(char letter) const
     {
         // Add code here or delete this helper function if you do not want it
+        letter = std::tolower(letter);
+        if (letter >= 'a' && letter <= 'z') // getting value if its a letter
+        {
+            return letter - 'a';
+        }
+        
+        if (letter >= '0' && letter <= '9') // getting value if its a number
+        {
+            return 26 + (letter - '0');
+        }
 
     }
 

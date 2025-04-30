@@ -90,10 +90,56 @@ std::set<std::string> boggle(const std::set<std::string>& dict, const std::set<s
 	
 	return result;
 }
-
-bool boggleHelper(const std::set<std::string>& dict, const std::set<std::string>& prefix, const std::vector<std::vector<char> >& board, 
-								   std::string word, std::set<std::string>& result, unsigned int r, unsigned int c, int dr, int dc)
+// returns true when we find the longes word (boggle is solved and we have the longest word)
+// returns false to end recursion early (out of bounds or finishes a recursive tree without finding longest word)
+bool boggleHelper(const std::set<std::string>& dict, 
+					const std::set<std::string>& prefix, 
+					const std::vector<std::vector<char> >& board, 
+					std::string word, 
+					std::set<std::string>& result, 
+					unsigned int r, unsigned int c, int dr, int dc)
 {
-//add your solution here!
+
+	if((r + dr < 0 || r + dr > board.size()) || (c + dc < 0 || c + dc > board[0].size())) // base case, out of bounds
+	{
+		return false; // ends recursion early
+	}
+
+	// finsih board check, same from sudoku
+	if(c == board[0].size()) // reached the end of a row
+	{
+		c = 0;
+		r++; // moving to next row
+		if(r == board.size()) // reached the end of the board
+		{
+			return true;
+		}
+	}
+
+	for(size_t i = 0; i < board[0].size(); i++) // searching starting at each letter in a row
+	{
+		word += board[r + dr][c + dc]; // add cell letter to word
+		if(dict.find(word) == dict.end()) // word is not in dict, skip this cell
+		{
+			return boggleHelper(); // recursive call
+		}
+		else // word is in dict
+		{
+			result.insert(word);
+			// recursive calls, do 3 different directions
+			if(boggleHelper(dict, prefix, board, word, result, r, c, dr + 0, dc + 1)
+				|| boggleHelper(dict, prefix, board, word, result, r, c, dr + 1, dc + 0)
+				|| boggleHelper(dict, prefix, board, word, result, r, c, dr + 1, dc + 1))
+				{
+					return true;
+				}
+			// this part only triggers if recursion fails, need to remove word
+			result.erase(word);
+			
+		}
+	}
+	
+	// trigger if recursion finishes/fails
+	return false;
 
 }
