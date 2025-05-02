@@ -36,5 +36,5 @@ std::set<std::string> boggle(const std::set<std::string>& dict, const std::set<s
  * - Stops if current word is not a prefix (backtracking).
  * - Only one direction is followed; no turning or reusing letters.
  */
-bool boggleHelper(const std::set<std::string>& dict, const std::set<std::string>& prefix, const std::vector<std::vector<char> >& board, std::string word, std::set<std::string>& result, unsigned int r, unsigned int c, int dr, int dc);
+bool boggleHelper(const std::set<std::string>& dict, const std::set<std::string>& prefix, const std::vector<std::vector<char> >& board, std::string word, std::string longestWord, std::set<std::string>& result, unsigned int r, unsigned int c, int dr, int dc);
 #endif

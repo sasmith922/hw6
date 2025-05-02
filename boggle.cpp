@@ -82,9 +82,9 @@ std::set<std::string> boggle(const std::set<std::string>& dict, const std::set<s
 	{
 		for(unsigned int j=0;j<board.size();j++)
 		{
-			boggleHelper(dict, prefix, board, "", result, i, j, 0, 1);
-			boggleHelper(dict, prefix, board, "", result, i, j, 1, 0);
-			boggleHelper(dict, prefix, board, "", result, i, j, 1, 1);
+			boggleHelper(dict, prefix, board, "", "", result, i, j, 0, 1);
+			boggleHelper(dict, prefix, board, "", "", result, i, j, 1, 0);
+			boggleHelper(dict, prefix, board, "", "", result, i, j, 1, 1);
 		}
 	}
 	
@@ -95,51 +95,38 @@ std::set<std::string> boggle(const std::set<std::string>& dict, const std::set<s
 bool boggleHelper(const std::set<std::string>& dict, 
 					const std::set<std::string>& prefix, 
 					const std::vector<std::vector<char> >& board, 
-					std::string word, 
+					std::string word,
+					std::string longestWord, 
 					std::set<std::string>& result, 
 					unsigned int r, unsigned int c, int dr, int dc)
 {
 
-	if((r + dr < 0 || r + dr > board.size()) || (c + dc < 0 || c + dc > board[0].size())) // base case, out of bounds
+    if(r >= board.size() || c >= board[0].size()) // base case, bounds check
 	{
-		return false; // ends recursion early
-	}
+        return false;
+    }
 
-	// finsih board check, same from sudoku
-	if(c == board[0].size()) // reached the end of a row
-	{
-		c = 0;
-		r++; // moving to next row
-		if(r == board.size()) // reached the end of the board
-		{
-			return true;
-		}
-	}
+    // add current letter to end of word
+	//std::string oldWord = word; // keep track of old word in case we need to remove bc it is prefix of longer word
+    //bool longestWordFound = false;
+	word += board[r][c];
 
-	for(size_t i = 0; i < board[0].size(); i++) // searching starting at each letter in a row
+    if(prefix.find(word) == prefix.end()) // not a valid prefix so return early
 	{
-		word += board[r + dr][c + dc]; // add cell letter to word
-		if(dict.find(word) == dict.end()) // word is not in dict, skip this cell
-		{
-			return boggleHelper(); // recursive call
-		}
-		else // word is in dict
+        return false;
+    }
+
+	if(word.length() >= 2 && dict.find(word) != dict.end()) // valid word and in dict
+	{
+		if(word.length() > longestWord.length())
 		{
 			result.insert(word);
-			// recursive calls, do 3 different directions
-			if(boggleHelper(dict, prefix, board, word, result, r, c, dr + 0, dc + 1)
-				|| boggleHelper(dict, prefix, board, word, result, r, c, dr + 1, dc + 0)
-				|| boggleHelper(dict, prefix, board, word, result, r, c, dr + 1, dc + 1))
-				{
-					return true;
-				}
-			// this part only triggers if recursion fails, need to remove word
-			result.erase(word);
-			
-		}
+			result.erase(longestWord);
+			longestWord = word;
+		}	
 	}
-	
-	// trigger if recursion finishes/fails
-	return false;
+
+	// move to next cell in the same direction
+	return boggleHelper(dict, prefix, board, word, longestWord, result, r + dr, c + dc, dr, dc); // recursive call
 
 }
