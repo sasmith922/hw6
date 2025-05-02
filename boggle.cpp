@@ -82,9 +82,9 @@ std::set<std::string> boggle(const std::set<std::string>& dict, const std::set<s
 	{
 		for(unsigned int j=0;j<board.size();j++)
 		{
-			boggleHelper(dict, prefix, board, "", "", result, i, j, 0, 1);
-			boggleHelper(dict, prefix, board, "", "", result, i, j, 1, 0);
-			boggleHelper(dict, prefix, board, "", "", result, i, j, 1, 1);
+			boggleHelper(dict, prefix, board, "", result, i, j, 0, 1);
+			boggleHelper(dict, prefix, board, "", result, i, j, 1, 0);
+			boggleHelper(dict, prefix, board, "", result, i, j, 1, 1);
 		}
 	}
 	
@@ -96,7 +96,6 @@ bool boggleHelper(const std::set<std::string>& dict,
 					const std::set<std::string>& prefix, 
 					const std::vector<std::vector<char> >& board, 
 					std::string word,
-					std::string longestWord, 
 					std::set<std::string>& result, 
 					unsigned int r, unsigned int c, int dr, int dc)
 {
@@ -107,8 +106,6 @@ bool boggleHelper(const std::set<std::string>& dict,
     }
 
     // add current letter to end of word
-	//std::string oldWord = word; // keep track of old word in case we need to remove bc it is prefix of longer word
-    //bool longestWordFound = false;
 	word += board[r][c];
 
     if(prefix.find(word) == prefix.end()) // not a valid prefix so return early
@@ -116,17 +113,20 @@ bool boggleHelper(const std::set<std::string>& dict,
         return false;
     }
 
-	if(word.length() >= 2 && dict.find(word) != dict.end()) // valid word and in dict
+	// found a longer, valid word in this direction
+	bool foundLonger = boggleHelper(dict, prefix, board, word, result, r + dr, c + dc, dr, dc); 
+
+	if(!foundLonger && (word.length() >= 2 && dict.find(word) != dict.end())) // valid word and in dict, base case for when we find 
 	{
-		if(word.length() > longestWord.length())
-		{
-			result.insert(word);
-			result.erase(longestWord);
-			longestWord = word;
-		}	
+		result.insert(word);
+		return true;
 	}
 
 	// move to next cell in the same direction
-	return boggleHelper(dict, prefix, board, word, longestWord, result, r + dr, c + dc, dr, dc); // recursive call
+	// return boggleHelper(dict, prefix, board, word, longestWord, result, r + dr, c + dc, dr, dc); // recursive call
+
+	// reach end of recursion
+	// return either the longer word or current word if it is valid
+	return foundLonger || (word.length() >= 2 && dict.find(word) != dict.end()); // technically a recursive call
 
 }
