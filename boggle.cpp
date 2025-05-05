@@ -113,28 +113,33 @@ bool boggleHelper(const std::set<std::string>& dict,
 
 	word += board[r][c]; // add current letter to end of word
 
-    if(prefix.find(word) == prefix.end()) // not a valid prefix so return early
+	bool foundLonger = false;
+    if(prefix.find(word) != prefix.end()) // not a valid prefix so return early
 	{
-        return false;
+    	foundLonger = boggleHelper(dict, prefix, board, word, result, r + dr, c + dc, dr, dc); 
+
     }
 
 	bool isValid = (word.length() >= 2 && dict.find(word) != dict.end());
-	bool foundLonger = boggleHelper(dict, prefix, board, word, result, r + dr, c + dc, dr, dc); 
-
-	if(isValid)
+	
+	if(isValid && !foundLonger)
 	{
-		if(foundLonger)
-		{
-			return foundLonger;
-		}
-		else
-		{
-			result.insert(word);
-		}
+		result.insert(word);
 		return true;
 	}
+	
+	// if(foundLonger)
+	// {
+	// 	return true;
+	// }
+	// else if(isValid)
+	// {
+	// 	result.insert(word);
+	// 	return true;
+	// }
 
-	return false;
+	return foundLonger;
+	//return foundLonger || isValid; // technically a recursive call
 
 	// // std::string longestWord = ""; // use to find the longest word in a path
 	// // if(isValid) // word is a valid word
