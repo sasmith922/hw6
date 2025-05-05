@@ -102,31 +102,70 @@ bool boggleHelper(const std::set<std::string>& dict,
 
     if(r >= board.size() || c >= board[0].size()) // base case, bounds check
 	{
+		if(!word.empty() && (word.length() >= 2 && dict.find(word) != dict.end())) // word is a valid word
+		{
+			result.insert(word);
+			return true;
+		}
         return false;
     }
+	// need to account for when we have valiud word then recurse but go out of bounds
 
-    // add current letter to end of word
-	word += board[r][c];
+	word += board[r][c]; // add current letter to end of word
 
     if(prefix.find(word) == prefix.end()) // not a valid prefix so return early
 	{
         return false;
     }
 
-	// found a longer, valid word in this direction
+	bool isValid = (word.length() >= 2 && dict.find(word) != dict.end());
 	bool foundLonger = boggleHelper(dict, prefix, board, word, result, r + dr, c + dc, dr, dc); 
 
-	if(!foundLonger && (word.length() >= 2 && dict.find(word) != dict.end())) // valid word and in dict, base case for when we find 
+	if(isValid)
 	{
-		result.insert(word);
+		if(foundLonger)
+		{
+			return foundLonger;
+		}
+		else
+		{
+			result.insert(word);
+		}
 		return true;
 	}
 
-	// move to next cell in the same direction
-	// return boggleHelper(dict, prefix, board, word, longestWord, result, r + dr, c + dc, dr, dc); // recursive call
+	return false;
 
-	// reach end of recursion
-	// return either the longer word or current word if it is valid
-	return foundLonger || (word.length() >= 2 && dict.find(word) != dict.end()); // technically a recursive call
+	// // std::string longestWord = ""; // use to find the longest word in a path
+	// // if(isValid) // word is a valid word
+	// // {
+	// // 	longestWord = word;
+	// // }
+
+	// // found a longer, valid word in this direction
+	
+	// // if(!foundLonger && isValid) // if we havent found a longer word in path and longestWord exists (and is a valid word)
+	// // {
+	// // 	result.insert(word);
+	// // 	return true;
+	// // }
+
+	// if(foundLonger)
+	// {
+	// 	return foundLonger;
+	// }
+	// else if(isValid)
+	// {
+	// 	result.insert(word);
+	// 	return true;
+	// }
+	// else
+	// {
+	// 	return false;
+	// }
+
+	// // reach end of recursion
+	// // return either the longer word or current word if it is valid
+	// return foundLonger || isValid; // technically a recursive call;
 
 }
