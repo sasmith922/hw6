@@ -478,24 +478,26 @@ void HashTable<K,V,Prober,Hash,KEqual>::resize()
         if(item != nullptr && !item->deleted) // only concerned with items that have not been deleted
         {
             // insert(item->item);
-
             HASH_INDEX_T h = hash_(item->item.first) % CAPACITIES[mIndex_];
             prober_.init(h, CAPACITIES[mIndex_], item->item.first);
             HASH_INDEX_T loc = prober_.next();
-            while (loc != npos && table_[loc] != nullptr) {
+
+            while(loc != npos && table_[loc] != nullptr) 
+            {
                 loc = prober_.next();
             }
-            if (loc == npos) {
+
+            if(loc == npos) 
+            {
                 throw std::logic_error("No valid location to insert during resize");
             }
+
             table_[loc] = new HashItem(item->item);
             size_++;
-
         }
 
         delete item; // delete all items
     }
-    
 }
 
 // Almost complete
