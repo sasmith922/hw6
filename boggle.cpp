@@ -90,8 +90,7 @@ std::set<std::string> boggle(const std::set<std::string>& dict, const std::set<s
 	
 	return result;
 }
-// returns true when we find the longes word (boggle is solved and we have the longest word)
-// returns false to end recursion early (out of bounds or finishes a recursive tree without finding longest word)
+
 bool boggleHelper(const std::set<std::string>& dict, 
 					const std::set<std::string>& prefix, 
 					const std::vector<std::vector<char> >& board, 
@@ -99,78 +98,26 @@ bool boggleHelper(const std::set<std::string>& dict,
 					std::set<std::string>& result, 
 					unsigned int r, unsigned int c, int dr, int dc)
 {
-
     if(r >= board.size() || c >= board[0].size()) // base case, bounds check
 	{
-		if(!word.empty() && (word.length() >= 2 && dict.find(word) != dict.end())) // word is a valid word
-		{
-			result.insert(word);
-			return true;
-		}
         return false;
     }
-	// need to account for when we have valiud word then recurse but go out of bounds
-
-	word += board[r][c]; // add current letter to end of word
-
-	bool foundLonger = false;
-    if(prefix.find(word) != prefix.end()) // not a valid prefix so return early
-	{
-    	foundLonger = boggleHelper(dict, prefix, board, word, result, r + dr, c + dc, dr, dc); 
-
-    }
-
-	bool isValid = (word.length() >= 2 && dict.find(word) != dict.end());
 	
-	if(isValid && !foundLonger)
+	word += board[r][c]; // add current letter to end of word
+	bool isValid = (word.length() >= 2 && dict.find(word) != dict.end());
+	bool foundLonger = false; // condition to see if there is a longer word
+
+    if(prefix.find(word) != prefix.end()) // current word is a valid prefix
+	{
+		// recurse further down to search for longest word for this path
+    	foundLonger = boggleHelper(dict, prefix, board, word, result, r + dr, c + dc, dr, dc); 
+    }
+	
+	if(isValid && !foundLonger) // if the word we have is valid and is the longest word
 	{
 		result.insert(word);
-		return true;
+		return true; // end recursion early, this also indicates up recursive stack longest word is found
 	}
-	
-	// if(foundLonger)
-	// {
-	// 	return true;
-	// }
-	// else if(isValid)
-	// {
-	// 	result.insert(word);
-	// 	return true;
-	// }
 
-	return foundLonger;
-	//return foundLonger || isValid; // technically a recursive call
-
-	// // std::string longestWord = ""; // use to find the longest word in a path
-	// // if(isValid) // word is a valid word
-	// // {
-	// // 	longestWord = word;
-	// // }
-
-	// // found a longer, valid word in this direction
-	
-	// // if(!foundLonger && isValid) // if we havent found a longer word in path and longestWord exists (and is a valid word)
-	// // {
-	// // 	result.insert(word);
-	// // 	return true;
-	// // }
-
-	// if(foundLonger)
-	// {
-	// 	return foundLonger;
-	// }
-	// else if(isValid)
-	// {
-	// 	result.insert(word);
-	// 	return true;
-	// }
-	// else
-	// {
-	// 	return false;
-	// }
-
-	// // reach end of recursion
-	// // return either the longer word or current word if it is valid
-	// return foundLonger || isValid; // technically a recursive call;
-
+	return foundLonger; // technically a recursive call, either recurses or returns false and ends recursion early
 }
